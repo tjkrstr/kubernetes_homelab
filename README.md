@@ -7,14 +7,14 @@ Because the devices are laptops the screen/power saving options will be changed 
 
 ```bash
 # Disable Suspend and Hibernation deamons 
-sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
+$ sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
 # Check that their status is in fact inactive 
-sudo systemctl status sleep.target suspend.target hibernate.target hybrid-sleep.target
+$ sudo systemctl status sleep.target suspend.target hibernate.target hybrid-sleep.target
 # If necessary enabling the deamons can be done with the following command:
-sudo systemctl unmask sleep.target suspend.target hibernate.target hybrid-sleep.target
+$ sudo systemctl unmask sleep.target suspend.target hibernate.target hybrid-sleep.target
 
 
-sudo vim /etc/systemd/logind.conf
+$ sudo vim /etc/systemd/logind.conf
 
 # Replace whatever values of following to "ignore"
 HandleHibernateKey=ignore
@@ -23,7 +23,7 @@ HandleLidSwitchExternalPower=ignore
 HandleLidSwitchDocked=ignore
 
 # Restart the login service
-systemctl restart systemd-logind
+$ systemctl restart systemd-logind
 ```
 
 ## K3s setup
@@ -31,8 +31,8 @@ K3s has been used during the execution of this project. The [setup](https://k3s.
 
 Setup the k3s server (master node) using the following command:
 ```bash
-curl -sfL https://get.k3s.io | sh - 
-sudo k3s kubectl get node 
+$ curl -sfL https://get.k3s.io | sh - 
+$ sudo k3s kubectl get node 
 ```
 
 Setup worker node we requred the ip of the master node along with its token which is located in /etc/lib/rancher/k3s/server/node-token. Add the worker node using the following command and necessary information.
@@ -54,29 +54,31 @@ K3S_URL=https://10.12.1.40:6443
 
 Get all the nodes in the k3s cluster to check if the worker node has been added.
 ```bash
-kubectl get nodes -o wide
+$ kubectl get nodes -o wide
 ```
 
 The worker node has been added to the cluster BUT has not been specified or authorised [cluster access](https://docs.k3s.io/cluster-access). If access to the cluster is needed from the worker node the `kubeconfig` located on the master (k3s server) in /etc/rancher/k3s/k3s.yaml must be copoed onto the machine as ~/.kube/config.
 
 ```bash
-scp /etc/rancher/k3s/k3s.yaml <worker_node>@<worker_node_ip>:~/.kube/config
+$ scp /etc/rancher/k3s/k3s.yaml <worker_node>@<worker_node_ip>:~/.kube/config
 ```
 
 Replace the value of the `server:` field with the IP or name of your k3s server. kubectl can now manage your K3s cluster.
 
 
 # Helm
-Install helm
+When running applications in k3s .yaml files specifying a variety of parameters are essentially added to the cluster. In an effort to easen this process [Helm](https://helm.sh/) can be utilized. It is a package manager for Kubernetes streamlining the installation and management of Kubernetes applications.
+Helm use a packaging format called as **Charts** which is basically a collection of yaml manifest files.
 
+Install helm using the following commands:
 ```bash
-$ curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+$ curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 
 $ chmod 700 get_helm.sh
 $ ./get_helm.sh
 ```
 
 Check helm version and if helm relevant pods are running
-```
-helm version
-kubectl get pods -n kube-system
+```bash
+$ helm version
+$ kubectl get pods -n kube-system
 ```
