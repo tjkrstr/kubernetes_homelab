@@ -110,7 +110,7 @@ $ kubectl service grafana-ext
 
 When running grafana a username and password is generated. To fetch these use the following commands (the username is `admin` but the password has changed):
 ```bash
-# Get deployment info
+# Get deployment info for grafana
 $ kubectl get secret --namespace default grafana -o yaml
 
 # Decrypt password
@@ -119,3 +119,27 @@ $ echo <password_value> | openssl base64 -d ; echo
 # Decript username
 $ echo <username_value> | openssl base64 -d ; echo
 ```
+
+## Helmfile
+[Helmfile](https://github.com/helmfile/helmfile) is a declarative spec for deploying helm charts ([blue-book](https://lyz-code.github.io/blue-book/devops/helmfile/)). Installation on debian based systems (get the tar.gz file from [source](https://github.com/helmfile/helmfile/releases)):
+```bash
+$ wget helm_file_url
+$ tar xvfz helmfile_0.157.0_linux_amd64.tar.gz 
+$ chmod +x helmfile
+$ mv ./helmfile /usr/bin/
+```
+Create a [helmfile.yaml](https://helmfile.readthedocs.io/en/latest/#installation
+) representing the desired state of your helm releases. A helmfile.yaml will be created based on the depolyment displayed under [Monitoring](#monitoring). The following commands were used to deploy to a k3s cluster (inside the folder where .yaml file is located):
+
+```bash
+# Install required dependencies using init:
+$ helmfile init
+
+# Sync your Kubernetes cluster state to the desired one by running:
+$ helmfile app
+```
+
+When the deployment is no longer needed it can simply be removed by running the
+```$ helmfile delete```.
+
+
