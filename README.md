@@ -66,7 +66,7 @@ $ scp /etc/rancher/k3s/k3s.yaml <worker_node>@<worker_node_ip>:~/.kube/config
 Replace the value of the `server:` field with the IP or name of your k3s server. kubectl can now manage your K3s cluster.
 
 
-# Helm
+## Helm
 When running applications in k3s .yaml files specifying a variety of parameters are essentially added to the cluster. In an effort to easen this process [Helm](https://helm.sh/) can be utilized. It is a package manager for Kubernetes streamlining the installation and management of Kubernetes applications.
 Helm use a packaging format called as **Charts** which is basically a collection of yaml manifest files.
 
@@ -81,4 +81,41 @@ Check helm version and if helm relevant pods are running
 ```bash
 $ helm version
 $ kubectl get pods -n kube-system
+```
+
+## Monitoring
+The following monitoring setup is based on an [article](https://medium.com/globant/setup-prometheus-and-grafana-monitoring-on-kubernetes-cluster-using-helm-3484efd85891) setting up Prometheus and Grafana using Helm. `This setup can be improved and is mainly a practice setup`
+
+Adding, installing and exposing prometheus and grafana:
+```bash
+# Add relevant repos
+$ helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+$ helm repo add grafana https://grafana.github.io/helm-charts
+
+$ helm repo update
+
+# Install applications
+$ helm install prometheus prometheus-community/prometheus
+$ helm install grafana grafana/grafana
+
+# Expose applications as a service using a node port:
+$ kubectl expose service prometheus-server — type=NodePort — target-port=9090 — name=prometheus-server-ext
+$ kubectl expose service grafana — type=NodePort — target-port=3000 — name=grafana-ext
+
+
+# Check if expose service is running
+$ kubectl service prometheus-server-ext
+$ kubectl service grafana-ext
+```
+
+When running grafana a username and password is generated. To fetch these use the following commands (the username is `admin` but the password has changed):
+```bash
+# Get deployment info
+$ kubectl get secret --namespace default grafana -o yaml
+
+# Decrypt password
+$ echo <password_value> | openssl base64 -d ; echo
+
+# Decript username
+$ echo <username_value> | openssl base64 -d ; echo
 ```
