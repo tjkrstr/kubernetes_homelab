@@ -99,9 +99,8 @@ $ helm install prometheus prometheus-community/prometheus
 $ helm install grafana grafana/grafana
 
 # Expose applications as a service using a node port:
-$ kubectl expose service prometheus-server — type=NodePort — target-port=9090 — name=prometheus-server-ext
-$ kubectl expose service grafana — type=NodePort — target-port=3000 — name=grafana-ext
-
+$ kubectl expose service prometheus-server --type=NodePort --target-port=9090 --name=prometheus-server-ext
+$ kubectl expose service grafana --type=NodePort --target-port=3000 --name=grafana-ext
 
 # Check if expose service is running
 $ kubectl service prometheus-server-ext
@@ -120,6 +119,13 @@ $ echo <password_value> | openssl base64 -d ; echo
 $ echo <username_value> | openssl base64 -d ; echo
 ```
 
+If necessary services can be removed using the following command:
+```bash
+# Delete services
+$ kubectl delete svc prometheus-server-ext
+$ kubectl delete svc grafana-ext
+```
+
 ## Helmfile
 [Helmfile](https://github.com/helmfile/helmfile) is a declarative spec for deploying helm charts ([blue-book](https://lyz-code.github.io/blue-book/devops/helmfile/)). Installation on debian based systems (get the tar.gz file from [source](https://github.com/helmfile/helmfile/releases)):
 ```bash
@@ -136,10 +142,10 @@ Create a [helmfile.yaml](https://helmfile.readthedocs.io/en/latest/#installation
 $ helmfile init
 
 # Sync your Kubernetes cluster state to the desired one by running:
-$ helmfile app
+$ helmfile apply
+# OR
+$ helmfile -f helmfile.yaml
 ```
 
 When the deployment is no longer needed it can simply be removed by running the
 ```$ helmfile delete```.
-
-
