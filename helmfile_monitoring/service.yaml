@@ -8,9 +8,14 @@ spec:
     app: prometheus
   ports:
     - protocol: TCP
-      port: 9090
+      port: 80
       targetPort: 9090
+      nodePort: 30090
   type: NodePort
+
+---
+
+apiVersion: v1
 kind: Service
 metadata:
   name: grafana-ext
@@ -20,6 +25,7 @@ spec:
     app: grafana
   ports:
     - protocol: TCP
-      port: 3000
+      port: 80
       targetPort: 3000
+      nodePort: 30080
   type: NodePort
